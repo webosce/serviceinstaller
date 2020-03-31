@@ -1,4 +1,4 @@
-// Copyright (c) 2010-2021 LG Electronics, Inc.
+// Copyright (c) 2010-2023 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,12 +36,15 @@ static void _mkdir(char *dir)
 		len = strlen(tmp);
 		if (tmp[len - 1] == '/') tmp[len - 1] = '\0';
 		for(p = tmp + 1; *p; p++)
-			if (*p == '/') {
-				*p = '\0';
-				mkdir(tmp, S_IRWXU);
-				*p = '/';
-			}
-		mkdir(tmp, S_IRWXU);
+		    if (*p == '/') {
+			*p = 0;
+			if(mkdir(tmp, S_IRWXU) != 0)
+			    DBG("error in creating directory: %s", strerror(errno));
+
+			*p = '/';
+		    }
+		if(mkdir(tmp, S_IRWXU) != 0)
+		    DBG("error in creating directory: %s", strerror(errno));
 	}
 	if (tmp) free(tmp);
 }
