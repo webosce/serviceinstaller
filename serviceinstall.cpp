@@ -82,38 +82,31 @@ static void generateEndpoint(string id, string serviceDirectory, string endpoint
 	string line;
 	string destinationPath = endpointDirectory + "/" + id;
 	DIR *d;
-
+	
 	if ((d=opendir(endpointDirectory.c_str())) == NULL) {
 		_mkdir((char*)endpointDirectory.c_str());
-	} else {
-		closedir(d);
-	}
-
-	if (fexists(destinationPath)) return;
-
-	DBG("Creating %s", destinationPath.c_str());
-
-	ofstream newfile (destinationPath.c_str());
-
-    if  (newfile.is_open())
-    {
-
-		newfile << "[D-BUS Service]" << endl;
-		newfile << "Name=" << id << endl;
-		newfile << "Exec=" << WEBOS_INSTALL_BINDIR << "/run-js-service -n "<< serviceDirectory << endl;
-
-		newfile.close();
-	}
-
+		} else {
+			(void)closedir(d);
+		}
+		
+		if (fexists(destinationPath)) return;
+		DBG("Creating %s", destinationPath.c_str());
+		ofstream newfile (destinationPath.c_str());
+		if  (newfile.is_open())
+		{
+			newfile << "[D-BUS Service]" << endl;
+			newfile << "Name=" << id << endl;
+			newfile << "Exec=" << WEBOS_INSTALL_BINDIR << "/run-js-service -n "<< serviceDirectory << endl;
+			newfile.close();
+		}
 }
-
 static void deleteEndpoint(string id, string endpointDirectory)
 {
 	string destinationPath = endpointDirectory + "/" + id;
 	if (fexists(destinationPath)) {
 		DBG("Removing %s", destinationPath.c_str());
-		unlink(destinationPath.c_str());
-	}
+		(void)unlink(destinationPath.c_str());
+		}
 }
 
 static void deleteRoleFiles(string id)
@@ -125,12 +118,12 @@ static void deleteRoleFiles(string id)
 
 	if (fexists(pubPath)) {
 		DBG("Removing %s", pubPath.c_str());
-		unlink(pubPath.c_str());
+		(void)unlink(pubPath.c_str());
 	}
 
 	if (fexists(prvPath)) {
 		DBG("Removing %s", prvPath.c_str());
-		unlink(prvPath.c_str());
+		(void)unlink(prvPath.c_str());
 	}
 }
 
@@ -161,7 +154,7 @@ static void runConfigurator(string id, string serviceDirectory, string type, boo
     if (mainLoop == NULL) goto error;
 
     bool retVal;
-    LSErrorInit(&lserror);
+    (void)LSErrorInit(&lserror);
 
     retVal = LSRegister(NULL, &sh, &lserror);
     if (!retVal)
