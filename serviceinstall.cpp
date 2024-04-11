@@ -1,4 +1,4 @@
-// Copyright (c) 2010-2023 LG Electronics, Inc.
+// Copyright (c) 2010-2024 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -208,13 +208,29 @@ error:
     }
 }
 
+static bool runCommand(gchar *cmd)
+{
+    GError *error = NULL;
+    gchar *std_err = NULL;
+    bool ret = false;
+    gchar *args[] = { "sh", "-c", cmd, NULL };
+    DBG("%s: running %s", __func__, cmd);
 
+    ret = g_spawn_sync(NULL, args, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &std_err, NULL, &error);
+    if (error != NULL) {
+        DBG("runCommand error:[%s]", error->message);
+        g_error_free(error);
+    }
+    return ret;
+}
 
 static void updateLunaService()
 {
-	// temporary until LS has an API or mechanism to pick up changes
-	DBG("Updating LS Hub %s", "");
-	int result = system(WEBOS_INSTALL_SBINDIR "/ls-control scan-services");
+    // temporary until LS has an API or mechanism to pick up changes
+    DBG("Updating LS Hub %s", "");
+    gchar* cmd_gchar = g_strdup(WEBOS_INSTALL_SBINDIR "/ls-control scan-services");
+    (void) runCommand(cmd_gchar);
+    g_free (cmd_gchar);
 }
 
 
