@@ -212,16 +212,15 @@ static bool runCommand(gchar *cmd)
 {
     GError *error = NULL;
     gchar *std_err = NULL;
-    bool ret = false;
     gchar *args[] = { "sh", "-c", cmd, NULL };
     DBG("%s: running %s", __func__, cmd);
-
-    ret = g_spawn_sync(NULL, args, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &std_err, NULL, &error);
-    if (error != NULL) {
-        DBG("runCommand error:[%s]", error->message);
-        g_error_free(error);
+    if(!g_spawn_sync(NULL, args, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, &std_err, NULL, &error) || std_err[0] != '\0')
+    {
+      DBG("Child creation failed : [%s] or runCommand error:[%s]", error->message, std_err);
+      g_error_free(error);
+      return false;
     }
-    return ret;
+    return true;
 }
 
 static void updateLunaService()
